@@ -878,6 +878,39 @@ header p {
   border-color: var(--header-bg);
 }
 
+.overlay-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-toggle-layers {
+  border: 1px solid var(--line-strong);
+  background: var(--surface-alt);
+  color: var(--ink-secondary);
+  border-radius: var(--radius-sm);
+  padding: 3px 7px;
+  font: 700 12px system-ui, sans-serif;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-toggle-layers:hover {
+  background: var(--header-bg);
+  color: #fff;
+  border-color: var(--header-bg);
+}
+
+.map-controls-card.collapsed .layer-row,
+.map-controls-card.collapsed .control-divider {
+  display: none;
+}
+
+.map-controls-card.collapsed .overlay-header {
+  margin-bottom: 0;
+}
+
 .layer-row {
   display: flex;
   align-items: flex-start;
@@ -1720,11 +1753,13 @@ a:hover {
     height: auto;
   }
   .map-stage {
-    height: 62vh;
-    min-height: 420px;
+    height: 50vh;
+    min-height: 340px;
   }
   .map-controls-card {
-    width: 230px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    right: 10px;
     padding: 8px 10px;
   }
   .legend-card {
@@ -1776,7 +1811,10 @@ a:hover {
     <section class="map-overlay map-controls-card" aria-label="Camadas do mapa">
       <div class="overlay-header">
         <h2>Camadas</h2>
-        <button type="button" id="resetViewBtn" class="btn-reset-map" title="Voltar para a visão geral do Brasil">Brasil inteiro</button>
+        <span class="overlay-actions">
+          <button type="button" id="resetViewBtn" class="btn-reset-map" title="Voltar para a visão geral do Brasil">Brasil inteiro</button>
+          <button type="button" id="toggleLayersBtn" class="btn-toggle-layers" title="Recolher ou expandir camadas" aria-expanded="true" aria-label="Recolher ou expandir camadas">–</button>
+        </span>
       </div>
 
       <label class="layer-row">
@@ -2100,6 +2138,22 @@ map.getPane('municipal').style.opacity='.65';
 document.getElementById('resetViewBtn').onclick=()=>{
   map.setView(INITIAL_CENTER,INITIAL_ZOOM);
 };
+
+const controlsCard=document.querySelector('.map-controls-card');
+const toggleLayersBtn=document.getElementById('toggleLayersBtn');
+function refreshLayersToggle(){
+  const collapsed=controlsCard.classList.contains('collapsed');
+  toggleLayersBtn.textContent=collapsed?'+':'–';
+  toggleLayersBtn.setAttribute('aria-expanded',String(!collapsed));
+}
+toggleLayersBtn.onclick=()=>{
+  controlsCard.classList.toggle('collapsed');
+  refreshLayersToggle();
+};
+if(window.innerWidth<=820){
+  controlsCard.classList.add('collapsed');
+  refreshLayersToggle();
+}
 
 /* Tabs logic */
 const tabBtns=document.querySelectorAll('.tab-btn');
