@@ -1033,12 +1033,25 @@ header p {
 }
 
 .legend-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--ink-secondary);
   margin: 0 0 6px;
+}
+
+.legend-card.collapsed .legend-scale,
+.legend-card.collapsed .legend-items {
+  display: none;
+}
+
+.legend-card.collapsed .legend-title {
+  margin-bottom: 0;
 }
 
 .legend-scale {
@@ -1867,7 +1880,7 @@ a:hover {
 
     <!-- Floating Legend -->
     <aside class="map-overlay legend-card" aria-label="Legenda do mapa">
-      <div class="legend-title">Seções alteradas por UF</div>
+      <div class="legend-title"><span>Seções alteradas por UF</span><button type="button" id="toggleLegendBtn" class="btn-toggle-layers" title="Recolher ou expandir legenda" aria-expanded="true" aria-label="Recolher ou expandir legenda">–</button></div>
       <div class="legend-scale">
         <div class="scale-step"><span class="scale-bar" style="background:#f7c8ae"></span>1–5</div>
         <div class="scale-step"><span class="scale-bar" style="background:#ef9268"></span>6–19</div>
@@ -2164,6 +2177,22 @@ toggleLayersBtn.onclick=()=>{
 if(window.innerWidth<=820){
   controlsCard.classList.add('collapsed');
   refreshLayersToggle();
+}
+
+const legendCard=document.querySelector('.legend-card');
+const toggleLegendBtn=document.getElementById('toggleLegendBtn');
+function refreshLegendToggle(){
+  const collapsed=legendCard.classList.contains('collapsed');
+  toggleLegendBtn.textContent=collapsed?'+':'–';
+  toggleLegendBtn.setAttribute('aria-expanded',String(!collapsed));
+}
+toggleLegendBtn.onclick=()=>{
+  legendCard.classList.toggle('collapsed');
+  refreshLegendToggle();
+};
+if(window.innerWidth<=820){
+  legendCard.classList.add('collapsed');
+  refreshLegendToggle();
 }
 
 /* Tabs logic */
