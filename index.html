@@ -1148,12 +1148,41 @@ header p {
 /* Sidebar Tabs */
 .side-tabs {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr 30px;
   background: var(--surface-alt);
   border-bottom: 1px solid var(--line);
   padding: 6px 10px 0;
   gap: 4px;
   flex: none;
+}
+
+.side-toggle {
+  align-self: center;
+  justify-self: center;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  border-radius: var(--radius-sm);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font: 700 13px system-ui, sans-serif;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.side-toggle:hover {
+  background: var(--header-bg);
+  color: #fff;
+  border-color: var(--header-bg);
+}
+
+.side.collapsed #filterBar,
+.side.collapsed .tab-pane,
+.side.collapsed .side-footer,
+.side.collapsed #selectedBanner {
+  display: none;
 }
 
 .tab-btn {
@@ -1901,10 +1930,10 @@ a:hover {
       <button type="button" class="tab-btn active" data-tab="secoes">
         Seções <span id="tabCountSecoes" class="tab-count">441</span>
       </button>
-
       <button type="button" class="tab-btn" data-tab="ufs">
         Por UF <span class="tab-count">23</span>
       </button>
+      <button type="button" id="toggleListBtn" class="side-toggle" title="Recolher ou expandir listagem" aria-expanded="true" aria-label="Recolher ou expandir listagem">–</button>
     </nav>
 
     <!-- Context Banner when a Territory or Municipality is selected -->
@@ -2194,6 +2223,18 @@ if(window.innerWidth<=820){
   legendCard.classList.add('collapsed');
   refreshLegendToggle();
 }
+
+const sidePanel=document.querySelector('.side');
+const toggleListBtn=document.getElementById('toggleListBtn');
+function refreshListToggle(){
+  const collapsed=sidePanel.classList.contains('collapsed');
+  toggleListBtn.textContent=collapsed?'+':'–';
+  toggleListBtn.setAttribute('aria-expanded',String(!collapsed));
+}
+toggleListBtn.onclick=()=>{
+  sidePanel.classList.toggle('collapsed');
+  refreshListToggle();
+};
 
 /* Tabs logic */
 const tabBtns=document.querySelectorAll('.tab-btn');
