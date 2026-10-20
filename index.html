@@ -1724,7 +1724,7 @@ a:hover {
   .kpis {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 6px;
   }
   .kpi {
@@ -1745,16 +1745,27 @@ a:hover {
     height: auto;
   }
   .kpis {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .kpi span {
+    white-space: normal;
+    font-size: 10px;
+    line-height: 1.15;
   }
   .layout {
     display: flex;
     flex-direction: column;
     height: auto;
   }
+  header h1 {
+    font-size: 16px;
+  }
+  header p {
+    font-size: 11px;
+  }
   .map-stage {
-    height: 50vh;
-    min-height: 340px;
+    height: 36vh;
+    min-height: 240px;
   }
   .map-controls-card {
     width: auto;
