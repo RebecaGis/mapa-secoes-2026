@@ -1178,23 +1178,23 @@ header p {
   border-color: var(--header-bg);
 }
 
-.layout.list-collapsed {
+body.list-collapsed .layout {
   grid-template-columns: minmax(0, 1fr) 44px;
 }
 
-.layout.list-collapsed .side .tab-btn {
+body.list-collapsed .side .tab-btn {
   display: none;
 }
 
-.layout.list-collapsed .side .side-tabs {
+body.list-collapsed .side .side-tabs {
   grid-template-columns: 1fr;
   padding: 6px 4px;
 }
 
-.layout.list-collapsed .side #filterBar,
-.layout.list-collapsed .side .tab-pane,
-.layout.list-collapsed .side .side-footer,
-.layout.list-collapsed .side #selectedBanner {
+body.list-collapsed .side #filterBar,
+body.list-collapsed .side .tab-pane,
+body.list-collapsed .side .side-footer,
+body.list-collapsed .side #selectedBanner {
   display: none;
 }
 
@@ -1822,9 +1822,21 @@ a:hover {
     height: 36vh;
     min-height: 240px;
   }
-  .layout.list-collapsed .map-stage {
-    height: 80vh;
-    min-height: 240px;
+  body.list-collapsed {
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+  }
+  body.list-collapsed .layout {
+    height: 100%;
+  }
+  body.list-collapsed .map-stage {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+  }
+  body.list-collapsed .side {
+    flex: none;
   }
   .map-controls-card {
     width: auto;
@@ -2238,15 +2250,14 @@ if(window.innerWidth<=820){
   refreshLegendToggle();
 }
 
-const layoutEl=document.querySelector('.layout');
 const toggleListBtn=document.getElementById('toggleListBtn');
 function refreshListToggle(){
-  const collapsed=layoutEl.classList.contains('list-collapsed');
+  const collapsed=document.body.classList.contains('list-collapsed');
   toggleListBtn.textContent=collapsed?'+':'–';
   toggleListBtn.setAttribute('aria-expanded',String(!collapsed));
 }
 toggleListBtn.onclick=()=>{
-  layoutEl.classList.toggle('list-collapsed');
+  document.body.classList.toggle('list-collapsed');
   refreshListToggle();
   setTimeout(()=>map.invalidateSize(), 60);
 };
