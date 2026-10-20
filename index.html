@@ -1178,10 +1178,23 @@ header p {
   border-color: var(--header-bg);
 }
 
-.side.collapsed #filterBar,
-.side.collapsed .tab-pane,
-.side.collapsed .side-footer,
-.side.collapsed #selectedBanner {
+.layout.list-collapsed {
+  grid-template-columns: minmax(0, 1fr) 44px;
+}
+
+.layout.list-collapsed .side .tab-btn {
+  display: none;
+}
+
+.layout.list-collapsed .side .side-tabs {
+  grid-template-columns: 1fr;
+  padding: 6px 4px;
+}
+
+.layout.list-collapsed .side #filterBar,
+.layout.list-collapsed .side .tab-pane,
+.layout.list-collapsed .side .side-footer,
+.layout.list-collapsed .side #selectedBanner {
   display: none;
 }
 
@@ -1809,6 +1822,10 @@ a:hover {
     height: 36vh;
     min-height: 240px;
   }
+  .layout.list-collapsed .map-stage {
+    height: 80vh;
+    min-height: 240px;
+  }
   .map-controls-card {
     width: auto;
     max-width: calc(100vw - 20px);
@@ -2221,16 +2238,17 @@ if(window.innerWidth<=820){
   refreshLegendToggle();
 }
 
-const sidePanel=document.querySelector('.side');
+const layoutEl=document.querySelector('.layout');
 const toggleListBtn=document.getElementById('toggleListBtn');
 function refreshListToggle(){
-  const collapsed=sidePanel.classList.contains('collapsed');
+  const collapsed=layoutEl.classList.contains('list-collapsed');
   toggleListBtn.textContent=collapsed?'+':'–';
   toggleListBtn.setAttribute('aria-expanded',String(!collapsed));
 }
 toggleListBtn.onclick=()=>{
-  sidePanel.classList.toggle('collapsed');
+  layoutEl.classList.toggle('list-collapsed');
   refreshListToggle();
+  setTimeout(()=>map.invalidateSize(), 60);
 };
 
 /* Tabs logic */
