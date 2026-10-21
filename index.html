@@ -2111,8 +2111,8 @@ locationControl.onAdd=()=>{
   L.DomEvent.on(button,'click',e=>{
     L.DomEvent.stop(e);
     if(!window.isSecureContext){
-      if(window.confirm('A localização exige HTTPS. Abrir a versão segura do mapa?'))
-        window.location.href='https://rebecagis.github.io/mapa-secoes-2026/';
+      if(window.confirm('A localização exige HTTPS. Abrir este domínio pela conexão segura?'))
+        window.location.href=window.location.href.replace(/^http:/,'https:');
       return;
     }
     if(!navigator.geolocation){
