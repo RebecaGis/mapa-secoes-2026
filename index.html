@@ -886,6 +886,28 @@ header p {
   border-color: var(--header-bg);
 }
 
+.device-location-button {
+  display: block;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: #fff;
+  color: #1769aa;
+  font: 700 27px/34px system-ui, sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+.device-location-button:hover,
+.device-location-button:focus-visible {
+  background: #eaf4fb;
+}
+.device-location-button:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+
 .overlay-actions {
   display: flex;
   align-items: center;
@@ -2075,6 +2097,50 @@ document.getElementById('kpiVoters').textContent=`seções · ${totalVotersAll.t
 const INITIAL_CENTER=[-14.5,-52.0], INITIAL_ZOOM=4;
 const map=L.map('map',{zoomControl:false,minZoom:3,maxZoom:18}).setView(INITIAL_CENTER,INITIAL_ZOOM);
 L.control.zoom({position:'topleft'}).addTo(map);
+
+let deviceLocationMarker=null, deviceAccuracyCircle=null;
+const locationControl=L.control({position:'topleft'});
+locationControl.onAdd=()=>{
+  const box=L.DomUtil.create('div','leaflet-bar leaflet-control');
+  const button=L.DomUtil.create('button','device-location-button',box);
+  button.type='button';
+  button.textContent='⌖';
+  button.title='Mostrar minha localização';
+  button.setAttribute('aria-label','Mostrar minha localização no mapa');
+  L.DomEvent.disableClickPropagation(box);
+  L.DomEvent.on(button,'click',e=>{
+    L.DomEvent.stop(e);
+    if(!window.isSecureContext){
+      if(window.confirm('A localização exige HTTPS. Abrir a versão segura do mapa?'))
+        window.location.href='https://rebecagis.github.io/mapa-secoes-2026/';
+      return;
+    }
+    if(!navigator.geolocation){
+      window.alert('Este navegador não oferece localização do dispositivo.');
+      return;
+    }
+    button.disabled=true;
+    button.title='Obtendo localização…';
+    navigator.geolocation.getCurrentPosition(position=>{
+      const point=[position.coords.latitude,position.coords.longitude];
+      if(deviceLocationMarker)map.removeLayer(deviceLocationMarker);
+      if(deviceAccuracyCircle)map.removeLayer(deviceAccuracyCircle);
+      deviceAccuracyCircle=L.circle(point,{radius:position.coords.accuracy,color:'#1769aa',weight:1,fillColor:'#3b9bdb',fillOpacity:0.1,interactive:false}).addTo(map);
+      deviceLocationMarker=L.circleMarker(point,{radius:8,color:'#fff',weight:2,fillColor:'#1769aa',fillOpacity:1,interactive:false}).addTo(map);
+      map.setView(point,Math.max(map.getZoom(),13));
+      button.disabled=false;
+      button.title='Atualizar minha localização';
+    },error=>{
+      button.disabled=false;
+      button.title='Mostrar minha localização';
+      const message=error.code===1?'Permissão de localização negada. Libere o acesso nas configurações do navegador.':
+        error.code===3?'A localização demorou demais. Tente novamente.':'Não foi possível obter a localização deste dispositivo.';
+      window.alert(message);
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:300000});
+  });
+  return box;
+};
+locationControl.addTo(map);
 
 const OsmFetchLayer=L.TileLayer.extend({
   createTile:function(coords,done){
