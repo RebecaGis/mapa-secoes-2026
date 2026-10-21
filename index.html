@@ -1923,6 +1923,12 @@ a:hover {
           <input id="layerOpacity" type="range" min="20" max="100" value="65" aria-label="Intensidade das cores">
           <output id="opacityValue">65%</output>
         </label>
+        <label class="opacity-row" for="selectionOpacity" style="margin-top:8px">
+          <span>Área selecionada</span>
+          <input id="selectionOpacity" type="range" min="0" max="100" value="65" aria-label="Opacidade da área selecionada">
+          <output id="selectionOpacityValue">65%</output>
+        </label>
+        <small style="display:block;margin-top:4px;color:var(--muted)">0% mostra só o contorno.</small>
       </div>
 
       <div class="control-divider">
@@ -2130,28 +2136,26 @@ document.querySelectorAll('.basemap-btn').forEach(btn=>{
 map.getPane('tilePane').style.zIndex=200;
 map.createPane('states');map.getPane('states').style.zIndex=420;
 map.createPane('municipal');map.getPane('municipal').style.zIndex=430;
+map.createPane('selection');map.getPane('selection').style.zIndex=440;
+map.getPane('selection').style.pointerEvents='none';
 
 function color(n){return n>39?'#a92d2b':n>19?'#d9573e':n>5?'#ef9268':'#f7c8ae'}
 
 const stateBoundsByUf=new Map();
 const stateNameByUf=new Map();
-let selectedStateUf=null;
-function stateStyle(f){
-  const uf=f.properties.sigla;
-  const selected=uf===selectedStateUf;
-  return {
-    color:selected?'#641b24':'#5c514d',
-    weight:selected?3:1.1,
-    opacity:selected?1:.55,
-    fillColor:selected?'#a92d2b':color(counts[uf]||0),
-    fillOpacity:selected ? 0.8 : (counts[uf]||0) ? 0.28 : 0
-  };
-}
+const stateFeatureByUf=new Map();
 const stateLayer=L.geoJSON(states,{
   pane:'states',
-  style:stateStyle,
+  style:f=>({
+    color:'#5c514d',
+    weight:1.1,
+    opacity:.55,
+    fillColor:color(counts[f.properties.sigla]||0),
+    fillOpacity:(counts[f.properties.sigla]||0)?0.28:0
+  }),
   onEachFeature:(f,l)=>{
     const uf=f.properties.sigla;
+    stateFeatureByUf.set(uf,f);
     stateNameByUf.set(uf,f.properties.nome);
     stateBoundsByUf.set(uf,l.getBounds());
     const n=counts[uf]||0;
@@ -2162,15 +2166,8 @@ const stateLayer=L.geoJSON(states,{
   }
 }).addTo(map);
 
-function highlightState(uf){
-  selectedStateUf=uf||null;
-  stateLayer.eachLayer(layer=>{
-    layer.setStyle(stateStyle(layer.feature));
-    if(layer.feature.properties.sigla===selectedStateUf)layer.bringToFront();
-  });
-}
-
 const muniBoundsByKey=new Map();
+const muniFeatureByKey=new Map();
 const muniData=Array.isArray(municipalities)?{type:'FeatureCollection',features:municipalities}:municipalities;
 const municipalLayer=L.geoJSON(muniData,{
   pane:'municipal',
@@ -2184,6 +2181,7 @@ const municipalLayer=L.geoJSON(muniData,{
   onEachFeature:(f,l)=>{
     const p=f.properties;
     const k=p.uf+'|'+norm(p.nome);
+    muniFeatureByKey.set(k,f);
     muniBoundsByKey.set(k,l.getBounds());
     l.bindTooltip(`<strong>${esc(p.nome)} / ${p.uf}</strong>${p.n?'<br>'+p.n+' seção(ões) alterada(s)':'<br><span style="color:#64757d">Sem alterações</span>'}`,{sticky:true});
     if(p.n){
@@ -2196,6 +2194,27 @@ const municipalLayer=L.geoJSON(muniData,{
     }
   }
 }).addTo(map);
+
+let selectedFillOpacity=.65;
+const selectedStateLayer=L.geoJSON(null,{
+  pane:'selection',interactive:false,
+  style:()=>({color:'#641b24',weight:3,opacity:1,fillColor:'#a92d2b',fillOpacity:selectedFillOpacity})
+}).addTo(map);
+const selectedCityLayer=L.geoJSON(null,{
+  pane:'selection',interactive:false,
+  style:()=>({color:'#6f2a10',weight:3.5,opacity:1,fillColor:'#f5a623',fillOpacity:selectedFillOpacity})
+}).addTo(map);
+function highlightState(uf){
+  selectedStateLayer.clearLayers();
+  selectedCityLayer.clearLayers();
+  const feature=stateFeatureByUf.get(uf);
+  if(feature)selectedStateLayer.addData(feature);
+}
+function highlightCity(uf,city){
+  highlightState(uf);
+  const feature=muniFeatureByKey.get(uf+'|'+norm(city));
+  if(feature)selectedCityLayer.addData(feature);
+}
 
 const zoomBadge=document.getElementById('zoomBadge');
 function updateMunicipal(){
@@ -2224,6 +2243,12 @@ document.getElementById('layerOpacity').oninput=e=>{
   map.getPane('states').style.opacity=String(v);
   map.getPane('municipal').style.opacity=String(v);
   document.getElementById('opacityValue').textContent=e.target.value+'%';
+};
+document.getElementById('selectionOpacity').oninput=e=>{
+  selectedFillOpacity=Number(e.target.value)/100;
+  selectedStateLayer.setStyle({fillOpacity:selectedFillOpacity});
+  selectedCityLayer.setStyle({fillOpacity:selectedFillOpacity});
+  document.getElementById('selectionOpacityValue').textContent=e.target.value+'%';
 };
 map.getPane('states').style.opacity='.65';
 map.getPane('municipal').style.opacity='.65';
@@ -2375,7 +2400,7 @@ function selectCity(uf,city,zoomMap){
   const display=s.rs.length?s.rs[0].nm_municipio:city;
   const b=muniBoundsByKey.get(k);
   if(zoomMap) focusCityOnMap(uf,city);
-  highlightState(uf);
+  highlightCity(uf,city);
   ufSel.value=uf;
   search.value=display;
   const moves=s.top.map(([name,n])=>`<div>${esc(name)} <span>(${n})</span></div>`).join('');
