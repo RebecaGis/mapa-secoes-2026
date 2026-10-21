@@ -2135,15 +2135,21 @@ function color(n){return n>39?'#a92d2b':n>19?'#d9573e':n>5?'#ef9268':'#f7c8ae'}
 
 const stateBoundsByUf=new Map();
 const stateNameByUf=new Map();
+let selectedStateUf=null;
+function stateStyle(f){
+  const uf=f.properties.sigla;
+  const selected=uf===selectedStateUf;
+  return {
+    color:selected?'#641b24':'#5c514d',
+    weight:selected?3:1.1,
+    opacity:selected?1:.55,
+    fillColor:selected?'#a92d2b':color(counts[uf]||0),
+    fillOpacity:selected ? 0.8 : (counts[uf]||0) ? 0.28 : 0
+  };
+}
 const stateLayer=L.geoJSON(states,{
   pane:'states',
-  style:f=>({
-    color:'#5c514d',
-    weight:1.1,
-    opacity:.55,
-    fillColor:color(counts[f.properties.sigla]||0),
-    fillOpacity:(counts[f.properties.sigla]||0)?0.28:0
-  }),
+  style:stateStyle,
   onEachFeature:(f,l)=>{
     const uf=f.properties.sigla;
     stateNameByUf.set(uf,f.properties.nome);
@@ -2155,6 +2161,14 @@ const stateLayer=L.geoJSON(states,{
     });
   }
 }).addTo(map);
+
+function highlightState(uf){
+  selectedStateUf=uf||null;
+  stateLayer.eachLayer(layer=>{
+    layer.setStyle(stateStyle(layer.feature));
+    if(layer.feature.properties.sigla===selectedStateUf)layer.bringToFront();
+  });
+}
 
 const muniBoundsByKey=new Map();
 const muniData=Array.isArray(municipalities)?{type:'FeatureCollection',features:municipalities}:municipalities;
@@ -2331,6 +2345,7 @@ function clearSelectionAndFilters(){
   currentFocusBounds=null;
   ufSel.value='';
   search.value='';
+  highlightState(null);
   render();
 }
 
@@ -2346,6 +2361,7 @@ function selectState(uf,zoomMap){
   const n=counts[uf]||0;
   const b=stateBoundsByUf.get(uf);
   if(zoomMap && b) map.fitBounds(b,{padding:[24,24]});
+  highlightState(uf);
   ufSel.value=uf;
   search.value='';
   showBanner('Estado selecionado',`${name} (${uf})`,`${n} seção(ões) alterada(s) no estado.`,b);
@@ -2359,6 +2375,7 @@ function selectCity(uf,city,zoomMap){
   const display=s.rs.length?s.rs[0].nm_municipio:city;
   const b=muniBoundsByKey.get(k);
   if(zoomMap) focusCityOnMap(uf,city);
+  highlightState(uf);
   ufSel.value=uf;
   search.value=display;
   const moves=s.top.map(([name,n])=>`<div>${esc(name)} <span>(${n})</span></div>`).join('');
