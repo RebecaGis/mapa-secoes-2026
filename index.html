@@ -2143,6 +2143,8 @@ document.querySelectorAll('.basemap-btn').forEach(btn=>{
 
 map.getPane('tilePane').style.zIndex=200;
 map.createPane('states');map.getPane('states').style.zIndex=420;
+map.createPane('stateSelection');map.getPane('stateSelection').style.zIndex=425;
+map.getPane('stateSelection').style.pointerEvents='none';
 map.createPane('municipal');map.getPane('municipal').style.zIndex=430;
 map.createPane('selection');map.getPane('selection').style.zIndex=440;
 map.getPane('selection').style.pointerEvents='none';
@@ -2205,7 +2207,7 @@ const municipalLayer=L.geoJSON(muniData,{
 
 let selectedFillOpacity=.65;
 const selectedStateLayer=L.geoJSON(null,{
-  pane:'selection',interactive:false,
+  pane:'stateSelection',interactive:false,
   style:()=>({color:'#641b24',weight:3,opacity:1,fillColor:'#a92d2b',fillOpacity:selectedFillOpacity})
 }).addTo(map);
 const selectedCityLayer=L.geoJSON(null,{
