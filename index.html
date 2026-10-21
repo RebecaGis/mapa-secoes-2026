@@ -1928,8 +1928,8 @@ a:hover {
       <div class="control-divider">
         <label class="opacity-row" for="layerOpacity">
           <span>Opacidade</span>
-          <input id="layerOpacity" type="range" min="20" max="100" value="65" aria-label="Intensidade das cores">
-          <output id="opacityValue">65%</output>
+          <input id="layerOpacity" type="range" min="20" max="100" value="100" aria-label="Intensidade das cores">
+          <output id="opacityValue">100%</output>
         </label>
         <label class="opacity-row" for="selectionOpacity" style="margin-top:8px">
           <span>Área selecionada</span>
@@ -2182,11 +2182,11 @@ const muniData=Array.isArray(municipalities)?{type:'FeatureCollection',features:
 const municipalLayer=L.geoJSON(muniData,{
   pane:'municipal',
   style:f=>({
-    color:f.properties.n?'#b25819':'#566d76',
-    weight:f.properties.n?1.6:0.55,
+    color:f.properties.n?'#853600':'#566d76',
+    weight:f.properties.n?2:0.55,
     opacity:f.properties.n?0.88:0.35,
-    fillColor:f.properties.n?'#e7a550':'#ffffff',
-    fillOpacity:f.properties.n?0.24:0
+    fillColor:f.properties.n?'#ffc857':'#ffffff',
+    fillOpacity:f.properties.n?0.92:0
   }),
   onEachFeature:(f,l)=>{
     const p=f.properties;
@@ -2260,8 +2260,8 @@ document.getElementById('selectionOpacity').oninput=e=>{
   selectedCityLayer.setStyle({fillOpacity:selectedFillOpacity});
   document.getElementById('selectionOpacityValue').textContent=e.target.value+'%';
 };
-map.getPane('states').style.opacity='.65';
-map.getPane('municipal').style.opacity='.65';
+map.getPane('states').style.opacity='1';
+map.getPane('municipal').style.opacity='1';
 
 document.getElementById('resetViewBtn').onclick=()=>{
   map.setView(INITIAL_CENTER,INITIAL_ZOOM);
