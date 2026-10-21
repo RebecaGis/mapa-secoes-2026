@@ -2193,11 +2193,16 @@ const municipalLayer=L.geoJSON(muniData,{
     const k=p.uf+'|'+norm(p.nome);
     muniFeatureByKey.set(k,f);
     muniBoundsByKey.set(k,l.getBounds());
-    l.bindTooltip(`<strong>${esc(p.nome)} / ${p.uf}</strong>${p.n?'<br>'+p.n+' seção(ões) alterada(s)':'<br><span style="color:#64757d">Sem alterações</span>'}`,{sticky:true});
+    if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){
+      l.bindTooltip(`<strong>${esc(p.nome)} / ${p.uf}</strong>${p.n?'<br>'+p.n+' seção(ões) alterada(s)':'<br><span style="color:#64757d">Sem alterações</span>'}`,{sticky:true});
+      l.on('mouseover',()=>{if(l.isPopupOpen())l.closeTooltip()});
+      l.on('popupopen',()=>l.closeTooltip());
+    }
     if(p.n){
       l.bindPopup(()=>cityPopupHtml(p),{maxWidth:300,minWidth:210,autoPan:true});
       l.on('click',e=>{
         L.DomEvent.stopPropagation(e);
+        l.closeTooltip();
         selectCity(p.uf,p.nome,false);
         l.openPopup();
       });
