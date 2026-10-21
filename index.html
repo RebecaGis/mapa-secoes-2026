@@ -824,6 +824,14 @@ header p {
   height: 100%;
 }
 
+#map .leaflet-pane svg path:focus {
+  outline: none;
+}
+
+#map .leaflet-pane svg path:focus-visible {
+  filter: drop-shadow(0 0 3px #26343a);
+}
+
 .map-overlay {
   position: absolute;
   z-index: 800;
