@@ -14,8 +14,9 @@ deploy/
     └── municipios.js               # window.MUNICIPIOS_ALTERADOS (malha municipal integral IBGE) — ~12,7 MB
 ```
 
-- Os **dados de seções** (441 registros) e os **estados** estão embutidos no `index.html`.
-- A **malha municipal** (106 municípios com mudança, geometria integral do IBGE) fica em `data/municipios.js`.
+- Os **dados de seções** e os **estados** estão embutidos no `index.html`.
+- A **malha dos municípios com mudança**, com geometria integral do IBGE, fica em `data/municipios.js`.
+- Em 22/10/2026, às 06h28, o TSE informava **326 seções alteradas em 78 municípios**. Esses números mudam a cada atualização.
 - **Leaflet** está vendored localmente — o mapa funciona **offline** (basta abrir `index.html` ou servir a pasta).
 
 ## Fontes
