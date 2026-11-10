@@ -1,5 +1,11 @@
 # Mapa de Mudanças de Seções · 2º Turno 2026
 
+<!-- project-badges:start -->
+![WebGIS: Leaflet](https://img.shields.io/static/v1?label=WebGIS&message=Leaflet&color=forestgreen&style=flat)
+![Dados: TSE · IBGE](https://img.shields.io/static/v1?label=Dados&message=TSE%20%C2%B7%20IBGE&color=blue&style=flat)
+[![Autoria: Rebeca Diniz Moura](https://img.shields.io/static/v1?label=Autoria&message=Rebeca%20Diniz%20Moura&color=8b5cf6&style=flat)](https://github.com/RebecaGis)
+<!-- project-badges:end -->
+
 Mapa interativo (Leaflet) das seções eleitorais alteradas entre o 1º e o 2º turno das Eleições 2026, com informação por **município** e **estado**.
 
 ## Estrutura
